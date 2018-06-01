@@ -5,6 +5,7 @@
     <string name="logo_name">MainLogo</string>
 
     <string name="hint_email">Email</string>
+    <string name="hint_text_box">I want to ... </string>
     <string name="hint_password">Password</string>
     <string name="get_started">GET STARTED!</string>
 
@@ -12,6 +13,8 @@
     <string name="title_profile">Profile</string>
     <string name="title_dashboard"></string>
     <string name="title_messages">Messages</string>
+
+    <string name="search_button">Search</string>
 
     <string name="picture_1">picture_1</string>
     <string name="picture_2">picture_2</string>

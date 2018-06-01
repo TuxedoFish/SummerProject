@@ -7,4 +7,6 @@
     <color name="colorUnderlineText">#00c5FF</color>
 
     <color name="colorText">#FFFFFF</color>
+
+    <color name="colorSearchBox">#70999999</color>
 </resources>
