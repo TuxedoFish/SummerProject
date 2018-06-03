@@ -1,54 +1,72 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <RelativeLayout
+    <android.support.constraint.ConstraintLayout
         android:id="@+id/search_box"
-        android:layout_width="200dp"
+        android:layout_width="250dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="64dp"
         android:background="@drawable/search_box"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
-        <RelativeLayout
-            android:id="@+id/textEntry"
-            android:layout_width="wrap_content"
+
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingTop="8dp">
+            android:gravity="center"
+            android:orientation="vertical"
+            android:visibility="visible"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
             <TextView
-                android:id="@+id/textView4"
-                android:layout_width="40pt"
-                android:layout_height="40dp"
+                android:id="@+id/textView5"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:layout_marginTop="16dp"
                 android:text="@string/hint_text_box"
                 android:textAlignment="center"
-                android:gravity="center_vertical"/>
+                android:textColor="@color/colorText"
+                android:paddingStart="33dp"
+                android:paddingEnd="33dp"
+                android:textSize="13sp"
+                android:textStyle="bold" />
 
-            <EditText
-                android:id="@+id/editText"
-                android:layout_width="60pt"
-                android:layout_height="40dp"
+            <com.example.harry.umbrellafindr.TextThumbBarSeek
+                android:id="@+id/seekBar"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
                 android:gravity="center"
-                android:ems="10"
-                android:layout_toRightOf="@id/textView4"
-                android:inputType="textPersonName"
-                android:text="Name" />
-        </RelativeLayout>
-        <Button
-            android:id="@+id/button2"
-            android:layout_width="80pt"
-            android:layout_height="40dp"
-            android:layout_marginBottom="8dp"
-            android:layout_marginTop="8dp"
-            android:layout_below="@id/textEntry"
-            android:layout_centerHorizontal="true"
-            android:text="@string/search_button"
-            tools:layout_editor_absoluteX="57dp"
-            tools:layout_editor_absoluteY="112dp" />
-    </RelativeLayout>
+                android:max="100"
+                android:paddingStart="33dp"
+                android:paddingEnd="33dp"
+                android:progress="50"
+                android:progressDrawable="@drawable/seekbar_bar"
+                android:thumb="@drawable/seekbar_thumb" />
+
+            <Button
+                android:id="@+id/button2"
+                android:layout_width="match_parent"
+                android:layout_height="35dp"
+                android:layout_marginBottom="16dp"
+                android:layout_marginLeft="33dp"
+                android:layout_marginRight="33dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/button_main"
+                android:clickable="true"
+                android:enabled="true"
+                android:textStyle="bold"
+                android:text="@string/search_button"
+                android:textSize="13sp"/>
+
+        </LinearLayout>
+
+    </android.support.constraint.ConstraintLayout>
 
 </android.support.constraint.ConstraintLayout>

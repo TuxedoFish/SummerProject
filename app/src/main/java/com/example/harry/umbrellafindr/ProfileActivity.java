@@ -21,6 +21,7 @@ public class ProfileActivity extends AppCompatActivity {
                 case R.id.navigation_profile:
                     ProfileFragment profile = new ProfileFragment();
                     openFragment(profile, R.id.contentPanel);
+                    closeFragment(R.id.overlayPanel);
                     return true;
                 case R.id.navigation_map:
                     MapFragment maps = new MapFragment();
@@ -31,11 +32,21 @@ public class ProfileActivity extends AppCompatActivity {
                 case R.id.navigation_messages:
                     MessagesFragment messages = new MessagesFragment();
                     openFragment(messages, R.id.contentPanel);
+                    closeFragment(R.id.overlayPanel);
                     return true;
             }
             return false;
         }
     };
+
+    private void closeFragment(int id) {
+        FragmentManager fragmentManager = getFragmentManager();
+        if(fragmentManager.findFragmentById(id) != null) {
+            FragmentTransaction transaction = fragmentManager.beginTransaction();
+            transaction.remove(fragmentManager.findFragmentById(id));
+            transaction.commit();
+        }
+    }
 
     private void openFragment(Fragment fragment, int id) {
         FragmentManager fragmentManager = getFragmentManager();

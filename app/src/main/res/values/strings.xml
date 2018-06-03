@@ -1,20 +1,38 @@
 <resources>
     <string name="app_name">UmbrellaFindr</string>
-    <string name="title_activity_maps">Map</string>
-    <string name="title_activity_log_in">LogInActivity</string>
+    <string name="title_activity_log_in">Welcome!</string>
+    <string name="title_activity_profile">Umbrelly</string>
+
     <string name="logo_name">MainLogo</string>
 
+    //Log in page strings
     <string name="hint_email">Email</string>
-    <string name="hint_text_box">I want to ... </string>
     <string name="hint_password">Password</string>
-    <string name="get_started">GET STARTED!</string>
+    <string name="get_started">GET STARTED</string>
+    <string name="register">REGISTER</string>
+    <string name="forgotten_password"><u>forgot password?</u></string>
 
-    <string name="title_activity_profile">ProfileActivity</string>
+    //Map page strings
+    <string name="hint_text_box">HOW LONG HAVE YOU GOT?</string>
+
+    //Register page strings
+    <string name="hint_first_name">Enter your <b>first name</b></string>
+    <string name="hint_enter_email">Enter an authentic UCL email</string>
+    <string name="hint_choose_password">Choose a strong password</string>
+    <string name="hint_confirm_password">Confirm password</string>
+    <string name="male">Male</string>
+    <string name="female">Female</string>
+
     <string name="title_profile">Profile</string>
     <string name="title_dashboard"></string>
     <string name="title_messages">Messages</string>
 
-    <string name="search_button">Search</string>
+    <string name="time_min">30</string>
+    <string name="time_2">60</string>
+    <string name="time_3">90</string>
+    <string name="time_max">120</string>
+
+    <string name="search_button">Look for matches</string>
 
     <string name="picture_1">picture_1</string>
     <string name="picture_2">picture_2</string>
@@ -25,7 +43,4 @@
         took a galley of type and scrambled it to make a type specimen book. It has survived not only five
         centuries, but also the leap into electronic typesetting, remaining essentially unchanged. </string>
     <string name="profile_name">Placeholder Name</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

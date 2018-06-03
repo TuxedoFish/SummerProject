@@ -4,9 +4,14 @@
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FFFFFF</color>
 
+    <color name="colorComplimentary">#f7501d</color>
+    <color name="colorComplimentaryDark">#cc491b</color>
+
     <color name="colorUnderlineText">#00c5FF</color>
 
     <color name="colorText">#FFFFFF</color>
 
-    <color name="colorSearchBox">#70999999</color>
+    <color name="colorSearchBox">#99999999</color>
+
+    <color name="genderSwitchColor"></color>
 </resources>
