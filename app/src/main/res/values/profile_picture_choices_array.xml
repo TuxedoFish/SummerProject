@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array
+        name="profile_picture_choices_array">
+        <item>Take a new photo</item>
+        <item>Choose from gallery</item>
+    </array>
+</resources>

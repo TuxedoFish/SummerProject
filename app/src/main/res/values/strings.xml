@@ -22,6 +22,7 @@
     <string name="hint_confirm_password">Confirm password</string>
     <string name="male">Male</string>
     <string name="female">Female</string>
+    <string name="finish_register">REGISTER</string>
 
     <string name="title_profile">Profile</string>
     <string name="title_dashboard"></string>
@@ -33,6 +34,9 @@
     <string name="time_max">120</string>
 
     <string name="search_button">Look for matches</string>
+
+    <string name="hint_profile_picture">Take/Upload a profile picture</string>
+    <string name="choose_profile_picture">Choose a profile picture</string>
 
     <string name="picture_1">picture_1</string>
     <string name="picture_2">picture_2</string>
