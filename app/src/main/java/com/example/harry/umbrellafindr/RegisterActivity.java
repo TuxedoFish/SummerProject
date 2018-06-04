@@ -1,5 +1,6 @@
 package com.example.harry.umbrellafindr;
 
+import android.app.AlertDialog;
 import android.app.DialogFragment;
 import android.content.Intent;
 import android.net.Uri;
@@ -9,12 +10,21 @@ import android.os.Bundle;
 import android.support.v7.widget.SwitchCompat;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
+
+import com.google.firebase.auth.FirebaseAuth;
 
 public class RegisterActivity extends AppCompatActivity implements View.OnTouchListener, ProfilePictureDialogBox.DialogListener{
 
     public SwitchCompat mGenderSwitch;
     public ImageView mProfilePicture;
+
+    public EditText mEmail;
+    public EditText mPassword;
+    public EditText mConfirmPassword;
+
+    private FirebaseAuth mAuth;
 
     private static final int RESULT_LOAD_IMAGE = 1;
 
@@ -28,6 +38,12 @@ public class RegisterActivity extends AppCompatActivity implements View.OnTouchL
 
         mProfilePicture = findViewById(R.id.imageView4);
         mProfilePicture.setOnTouchListener(this);
+
+        mEmail = findViewById(R.id.editEmail);
+        mPassword = findViewById(R.id.editPassword);
+        mConfirmPassword = findViewById(R.id.editConfirmPassword);
+
+        mAuth = FirebaseAuth.getInstance();
     }
 
     @Override
@@ -36,6 +52,37 @@ public class RegisterActivity extends AppCompatActivity implements View.OnTouchL
             case R.id.imageView4:
                 DialogFragment profilePictureDialogBoxFragment = new ProfilePictureDialogBox();
                 profilePictureDialogBoxFragment.show(getFragmentManager(), "profiles");
+                break;
+            case R.id.registerButton:
+                String email = mEmail.getText().toString();
+                String password = mPassword.getText().toString();
+                String confirmPassword = mConfirmPassword.getText().toString();
+
+                if(password.equals(confirmPassword)) {
+//                    mAuth.createUserWithEmailAndPassword(email, password)
+//                            .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+//                                @Override
+//                                public void onComplete(@NonNull Task<AuthResult> task) {
+//                                    if (task.isSuccessful()) {
+//                                        // Sign in success, update UI with the signed-in user's information
+//                                        Log.d(TAG, "createUserWithEmail:success");
+//                                        FirebaseUser user = mAuth.getCurrentUser();
+//                                        updateUI(user);
+//                                    } else {
+//                                        // If sign in fails, display a message to the user.
+//                                        Log.w(TAG, "createUserWithEmail:failure", task.getException());
+//                                        Toast.makeText(EmailPasswordActivity.this, "Authentication failed.",
+//                                                Toast.LENGTH_SHORT).show();
+//                                        updateUI(null);
+//                                    }
+//
+//                                    // ...
+//                                }
+//                            });
+                } else {
+//                    AlertDialog failedToRegister = new AlertDialog();
+
+                }
                 break;
         }
 
