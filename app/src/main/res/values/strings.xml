@@ -23,6 +23,15 @@
     <string name="male">Male</string>
     <string name="female">Female</string>
     <string name="finish_register">REGISTER</string>
+    <string name="failed_to_register">Failed to register!!! check you have completed all the boxes</string>
+    <string name="confirm">Confirm</string>
+
+    <string name="sent_verification">We have sent you an email verification, check your emails and follow the link to confirm your email address</string>
+    <string name="sign_in_other_account">sign in with another account</string>
+    <string name="open_mail">OPEN MAIL</string>
+
+    <string name="hint_forgot_password">Enter the password you registered with</string>
+    <string name="hint_submit">Submit</string>
 
     <string name="title_profile">Profile</string>
     <string name="title_dashboard"></string>

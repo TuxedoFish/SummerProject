@@ -1,4 +1,4 @@
-package com.example.harry.umbrellafindr;
+package com.example.harry.umbrellafindr.app;
 
 import android.app.Fragment;
 import android.app.FragmentManager;
@@ -8,7 +8,8 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
-import android.widget.TextView;
+
+import com.example.harry.umbrellafindr.R;
 
 public class ProfileActivity extends AppCompatActivity {
 
@@ -53,7 +54,7 @@ public class ProfileActivity extends AppCompatActivity {
         FragmentTransaction transaction = fragmentManager.beginTransaction();
 
         transaction.replace(id, fragment);
-        transaction.addToBackStack(null);
+        transaction.disallowAddToBackStack();
         transaction.commit();
     }
 
@@ -67,8 +68,8 @@ public class ProfileActivity extends AppCompatActivity {
         SearchOverlayFragment searchOverlayFragment = new SearchOverlayFragment();
         openFragment(searchOverlayFragment, R.id.overlayPanel);
 
-        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
-        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+//        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
+//        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
     }
 
 }

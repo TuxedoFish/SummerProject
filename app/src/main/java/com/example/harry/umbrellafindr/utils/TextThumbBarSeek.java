@@ -1,4 +1,4 @@
-package com.example.harry.umbrellafindr;
+package com.example.harry.umbrellafindr.utils;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -10,6 +10,8 @@ import android.support.v7.widget.AppCompatSeekBar;
 import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.widget.SeekBar;
+
+import com.example.harry.umbrellafindr.R;
 
 public class TextThumbBarSeek extends AppCompatSeekBar {
 

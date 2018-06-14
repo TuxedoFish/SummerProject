@@ -1,4 +1,4 @@
-package com.example.harry.umbrellafindr;
+package com.example.harry.umbrellafindr.app;
 
 import android.app.Fragment;
 import android.os.Bundle;
@@ -7,6 +7,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.SeekBar;
+
+import com.example.harry.umbrellafindr.R;
 
 public class SearchOverlayFragment extends Fragment {
 

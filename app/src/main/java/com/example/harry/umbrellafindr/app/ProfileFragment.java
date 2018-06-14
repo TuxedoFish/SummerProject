@@ -1,4 +1,4 @@
-package com.example.harry.umbrellafindr;
+package com.example.harry.umbrellafindr.app;
 
 import android.content.Context;
 import android.net.Uri;
@@ -8,6 +8,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import com.example.harry.umbrellafindr.R;
 
 public class ProfileFragment extends android.app.Fragment {
     @Override

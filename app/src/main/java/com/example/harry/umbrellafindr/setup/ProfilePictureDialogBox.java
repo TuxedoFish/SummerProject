@@ -1,4 +1,4 @@
-package com.example.harry.umbrellafindr;
+package com.example.harry.umbrellafindr.setup;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -6,6 +6,8 @@ import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
+
+import com.example.harry.umbrellafindr.R;
 
 public class ProfilePictureDialogBox extends DialogFragment {
 

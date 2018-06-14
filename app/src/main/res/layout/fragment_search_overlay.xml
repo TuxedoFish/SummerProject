@@ -38,7 +38,7 @@
                 android:textSize="13sp"
                 android:textStyle="bold" />
 
-            <com.example.harry.umbrellafindr.TextThumbBarSeek
+            <com.example.harry.umbrellafindr.utils.TextThumbBarSeek
                 android:id="@+id/seekBar"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
