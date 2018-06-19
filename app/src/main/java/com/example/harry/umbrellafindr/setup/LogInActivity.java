@@ -65,18 +65,6 @@ public class LogInActivity extends AppCompatActivity implements View.OnTouchList
         mPassword = (EditText) findViewById(R.id.editPasswordLogIn);
 
         mAuth = FirebaseAuth.getInstance();
-//        db = FirebaseFirestore.getInstance();
-//
-//        DocumentReference docref = db.collection("users_info").document("test");
-//
-//        Map<String, Object> data  = new HashMap<>();
-//        data.put("first_name", "Harry");
-//        data.put("age", 19);
-//        data.put("gender", "male");
-//        data.put("bio", "unknown");
-//        data.put("profile_picture", "some string");
-//
-//        docref.set(data);
 
         if(mAuth.getCurrentUser()!=null) {
             start(mButtonStart);

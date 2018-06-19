@@ -30,40 +30,21 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
                 android:layout_marginTop="16dp"
+                android:paddingEnd="33dp"
+                android:paddingStart="33dp"
                 android:text="@string/hint_text_box"
                 android:textAlignment="center"
                 android:textColor="@color/colorText"
-                android:paddingStart="33dp"
-                android:paddingEnd="33dp"
-                android:textSize="13sp"
-                android:textStyle="bold" />
+                android:textSize="20sp" />
 
-            <com.example.harry.umbrellafindr.utils.TextThumbBarSeek
-                android:id="@+id/seekBar"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:gravity="center"
-                android:max="100"
-                android:paddingStart="33dp"
-                android:paddingEnd="33dp"
-                android:progress="50"
-                android:progressDrawable="@drawable/seekbar_bar"
-                android:thumb="@drawable/seekbar_thumb" />
-
-            <Button
-                android:id="@+id/button2"
-                android:layout_width="match_parent"
-                android:layout_height="35dp"
+            <ImageButton
+                android:id="@+id/searchButton"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
                 android:layout_marginBottom="16dp"
-                android:layout_marginLeft="33dp"
-                android:layout_marginRight="33dp"
-                android:layout_marginTop="8dp"
-                android:background="@drawable/button_main"
-                android:clickable="true"
-                android:enabled="true"
-                android:textStyle="bold"
-                android:text="@string/search_button"
-                android:textSize="13sp"/>
+                android:adjustViewBounds="true"
+                android:background="@drawable/button_icon"
+                android:scaleType="fitXY"/>
 
         </LinearLayout>
 

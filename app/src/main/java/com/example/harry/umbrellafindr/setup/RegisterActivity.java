@@ -24,6 +24,8 @@ import android.widget.Toast;
 
 import com.example.harry.umbrellafindr.R;
 import com.example.harry.umbrellafindr.utils.Utilities;
+import com.example.harry.umbrellafindr.utils.Constants;
+
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -54,11 +56,6 @@ public class RegisterActivity extends AppCompatActivity implements View.OnTouchL
     private FirebaseFirestore db;
 
     private Utilities utils;
-
-    private static final int RESULT_LOAD_IMAGE_TAKEN = 1;
-    private static final int RESULT_LOAD_IMAGE_GALLERY = 2;
-
-    private static final int MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE = 3;
 
     private boolean clicked = false;
 
@@ -259,15 +256,15 @@ public class RegisterActivity extends AppCompatActivity implements View.OnTouchL
                     String[] permissions = {Manifest.permission.WRITE_EXTERNAL_STORAGE};
 
                     ActivityCompat.requestPermissions(RegisterActivity.this,
-                            permissions, MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE);
+                            permissions, Constants.MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE);
                 }
                 Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-                startActivityForResult(cameraIntent, RESULT_LOAD_IMAGE_TAKEN);
+                startActivityForResult(cameraIntent, Constants.RESULT_LOAD_IMAGE_TAKEN);
                 break;
 
             case 1:
                 Intent galleryIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                startActivityForResult(galleryIntent, RESULT_LOAD_IMAGE_GALLERY);
+                startActivityForResult(galleryIntent, Constants.RESULT_LOAD_IMAGE_GALLERY);
                 break;
 
         }
@@ -279,10 +276,10 @@ public class RegisterActivity extends AppCompatActivity implements View.OnTouchL
         Uri selectedImage = null;
         Bitmap bmp = null;
 
-        if(requestCode == RESULT_LOAD_IMAGE_GALLERY && resultCode == RESULT_OK && data != null) {
+        if(requestCode == Constants.RESULT_LOAD_IMAGE_GALLERY && resultCode == RESULT_OK && data != null) {
             selectedImage = data.getData();
         }
-        if(requestCode == RESULT_LOAD_IMAGE_TAKEN && resultCode == RESULT_OK && data != null) {
+        if(requestCode == Constants.RESULT_LOAD_IMAGE_TAKEN && resultCode == RESULT_OK && data != null) {
             bmp = (Bitmap) data.getExtras().get("data");
 
             if (bmp != null) {

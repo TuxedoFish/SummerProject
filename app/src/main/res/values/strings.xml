@@ -13,7 +13,7 @@
     <string name="forgotten_password"><u>forgot password?</u></string>
 
     //Map page strings
-    <string name="hint_text_box">HOW LONG HAVE YOU GOT?</string>
+    <string name="hint_text_box">Click to find a <b>coffee</b> buddy</string>
 
     //Register page strings
     <string name="hint_first_name">Enter your <b>first name</b></string>

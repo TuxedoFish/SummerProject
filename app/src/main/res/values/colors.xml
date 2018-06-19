@@ -11,6 +11,8 @@
 
     <color name="colorText">#FFFFFF</color>
 
+    <color name="transparent">#00ffffff</color>
+
     <color name="colorSearchBox">#99999999</color>
 
     <color name="genderSwitchColor"></color>

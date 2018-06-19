@@ -3,42 +3,25 @@ package com.example.harry.umbrellafindr.app;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.graphics.drawable.RippleDrawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
+import android.view.MotionEvent;
+import android.view.View;
+import android.widget.ImageButton;
 
 import com.example.harry.umbrellafindr.R;
+import com.example.harry.umbrellafindr.utils.User;
 
 public class ProfileActivity extends AppCompatActivity {
+    public ImageButton mSearchButton;
+    public RippleDrawable mRippleRegister;
 
-    private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
-            = new BottomNavigationView.OnNavigationItemSelectedListener() {
-
-        @Override
-        public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-            switch (item.getItemId()) {
-                case R.id.navigation_profile:
-                    ProfileFragment profile = new ProfileFragment();
-                    openFragment(profile, R.id.contentPanel);
-                    closeFragment(R.id.overlayPanel);
-                    return true;
-                case R.id.navigation_map:
-                    MapFragment maps = new MapFragment();
-                    openFragment(maps, R.id.contentPanel);
-                    SearchOverlayFragment searchOverlayFragment = new SearchOverlayFragment();
-                    openFragment(searchOverlayFragment, R.id.overlayPanel);
-                    return true;
-                case R.id.navigation_messages:
-                    MessagesFragment messages = new MessagesFragment();
-                    openFragment(messages, R.id.contentPanel);
-                    closeFragment(R.id.overlayPanel);
-                    return true;
-            }
-            return false;
-        }
-    };
+    private User mUser;
+    private User[] fakeUsers;
 
     private void closeFragment(int id) {
         FragmentManager fragmentManager = getFragmentManager();
@@ -70,6 +53,22 @@ public class ProfileActivity extends AppCompatActivity {
 
 //        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
 //        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+
+        mSearchButton = (ImageButton)findViewById(R.id.searchButton);
+        mRippleRegister = (RippleDrawable)mSearchButton.getBackground();
+
+        mSearchButton.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                mRippleRegister.setHotspot(event.getX(), event.getY());
+                searchForUsers();
+                return false;
+            }
+        });
+    }
+
+    public void searchForUsers() {
+
     }
 
 }

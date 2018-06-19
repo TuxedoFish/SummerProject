@@ -1,30 +1,107 @@
 package com.example.harry.umbrellafindr.utils;
 
+import android.location.Location;
 import android.net.Uri;
+import android.support.annotation.NonNull;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.GeoPoint;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QuerySnapshot;
+
+import java.lang.reflect.Array;
+import java.util.HashMap;
+import java.util.Map;
 
 public class User {
-    private String firstName, email;
-    private int age;
-    private Uri imageURI;
+    private String mFirstName, mEmail;
+    private int mAge;
+    private Uri mimageURI;
+    private Constants.Gender mGender;
+    private String mUserID, mPartnerID;
+    private Location mLocation;
+    private int mStatus = Constants.STATUS_ONLINE;
 
-    private enum Gender {
-            MALE,
-            Female
+    public User(String userID, String firstname, String email, int age, Uri imageURI, Constants.Gender gender, Location location) {
+        setFirstName(firstname); setEmail(email); setAge(age); setImageURI(imageURI); setGender(gender); mUserID = userID; mLocation = location;
     }
-    private Gender gender;
 
-    public String getFirstName() { return firstName; }
-    public void setFirstName(String firstName) { this.firstName = firstName; }
+    public void beginSearching(FirebaseFirestore db) {
+        setmStatus(db, Constants.STATUS_SEARCHING);
+    }
 
-    public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
+    public void setmStatus(FirebaseFirestore db, int new_status) {
+        this.mStatus = new_status;
 
-    public int getAge() { return age; }
-    public void setAge(int age) { this.age = age; }
+        GeoPoint user_loc = new GeoPoint(mLocation.getLatitude(), mLocation.getLongitude());
 
-    public Uri getImageURI() { return imageURI; }
-    public void setImageURI(Uri imageURI) { this.imageURI = imageURI; }
+        Map<String, Object> data = new HashMap<>();
+        data.put("location", user_loc);
+        data.put("status", new_status);
 
-    public Gender getGender() { return gender; }
-    public void setGender(Gender gender) { this.gender = gender; }
+        db.collection("strollers").document(mUserID).set(data);
+    }
+    public int getmStatus() {
+        return mStatus;
+    }
+
+    private int search(FirebaseFirestore db) {
+        //Query database for nearby users where the distance is close and the status is 1 i.e. searching
+        Utilities utils = new Utilities();
+
+        if(utils.isRequests(db, mUserID)) {
+            //request found
+            setmStatus(db, Constants.STATUS_DECISION_A);
+            return Constants.RESULT_REQUESTED;
+        } else {
+            //no request found
+            Query query = utils.getUsersSearching(db, mLocation.getLatitude(), mLocation.getLongitude());
+            //check if there is any users currently online searching
+            query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                    mStatus = Constants.STATUS_PENDING;
+                }
+            });
+        }
+
+        if(mStatus == Constants.STATUS_PENDING) {
+            setmStatus(db, mStatus);
+            //Check if in the time it took another user has sent you or your potential partner a request
+            if(utils.isRequests(db, mUserID)) {
+                //request received
+                setmStatus(db, Constants.STATUS_DECISION_B);
+                //go to decision tree page
+                return Constants.RESULT_REQUESTED;
+            } else if (utils.isRequests(db, mPartnerID)) {
+                //other user has received a request hence will return to searching again
+                setmStatus(db, Constants.STATUS_SEARCHING);
+            } else {
+                //free to send a request to the other user
+                setmStatus(db, Constants.STATUS_DECISION_A);
+                //go to decision tree page
+                return Constants.RESULT_SEND_REQUEST;
+            }
+        }
+
+        return Constants.RESULT_NO_USERS;
+    }
+
+    public String getFirstName() { return mFirstName; }
+    public void setFirstName(String firstName) { this.mFirstName = firstName; }
+
+    public String getEmail() { return mEmail; }
+    public void setEmail(String email) { this.mEmail = email; }
+
+    public int getAge() { return mAge; }
+    public void setAge(int age) { this.mAge = age; }
+
+    public Uri getImageURI() { return mimageURI; }
+    public void setImageURI(Uri imageURI) { this.mimageURI = imageURI; }
+
+    public Constants.Gender getGender() { return mGender; }
+    public void setGender(Constants.Gender gender) { this.mGender = gender; }
 }
