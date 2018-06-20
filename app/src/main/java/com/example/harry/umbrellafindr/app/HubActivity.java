@@ -16,13 +16,7 @@ import android.widget.ImageButton;
 import com.example.harry.umbrellafindr.R;
 import com.example.harry.umbrellafindr.utils.User;
 
-public class ProfileActivity extends AppCompatActivity {
-    public ImageButton mSearchButton;
-    public RippleDrawable mRippleRegister;
-
-    private User mUser;
-    private User[] fakeUsers;
-
+public class HubActivity extends AppCompatActivity {
     private void closeFragment(int id) {
         FragmentManager fragmentManager = getFragmentManager();
         if(fragmentManager.findFragmentById(id) != null) {
@@ -53,22 +47,5 @@ public class ProfileActivity extends AppCompatActivity {
 
 //        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
 //        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
-
-        mSearchButton = (ImageButton)findViewById(R.id.searchButton);
-        mRippleRegister = (RippleDrawable)mSearchButton.getBackground();
-
-        mSearchButton.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                mRippleRegister.setHotspot(event.getX(), event.getY());
-                searchForUsers();
-                return false;
-            }
-        });
     }
-
-    public void searchForUsers() {
-
-    }
-
 }

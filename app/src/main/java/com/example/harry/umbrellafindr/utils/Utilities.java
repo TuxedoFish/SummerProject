@@ -2,11 +2,18 @@ package com.example.harry.umbrellafindr.utils;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 
+import com.example.harry.umbrellafindr.R;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
@@ -72,14 +79,15 @@ public class Utilities {
         }
     }
 
-    public void sendRequest(FirebaseFirestore db, String targetUserID) {
+    public void sendRequest(FirebaseFirestore db, String targetUserID, String userID) {
         DocumentReference docref = db.collection("strollers").document(targetUserID);
 
-        Map<String, Object> locationData = new HashMap<>();
-        locationData.put("user_A", Constants.NO_REPLY);
-        locationData.put("user_B", Constants.NO_REPLY);
+        Map<String, Object> requestData = new HashMap<>();
+        requestData.put("requester", userID);
+        requestData.put("user_A", Constants.NO_REPLY);
+        requestData.put("user_B", Constants.NO_REPLY);
 
-        docref.set(locationData);
+        docref.set(requestData);
     }
 
     private GeoPoint[] getLocationBounds(double latitude, double longitude) {
@@ -110,5 +118,26 @@ public class Utilities {
                 "profile picture");
 
         return Uri.parse(path);
+    }
+
+    public BitmapDescriptor bitmapDescriptorFromVector(Context context, @DrawableRes int vectorDrawableResourceId) {
+        double scaling_factor = 0.8f;
+        //Setup background of the marker
+        Drawable background = ContextCompat.getDrawable(context, R.drawable.ic_marker_background_48dp);
+        background.setBounds(0, 0, (int)(background.getIntrinsicWidth()*scaling_factor),(int)(background.getIntrinsicHeight()*scaling_factor));
+        //Draw the icon of the day
+        Drawable vectorDrawable = ContextCompat.getDrawable(context, vectorDrawableResourceId);
+        vectorDrawable.setBounds((int)(30*scaling_factor),  (int)(20*scaling_factor),
+                (int)((vectorDrawable.getIntrinsicWidth() + 30)*scaling_factor), (int)((vectorDrawable.getIntrinsicHeight() + 20)*scaling_factor));
+        //Create a new bitmap to draw onto
+        Bitmap bitmap = Bitmap.createBitmap((int)(scaling_factor*background.getIntrinsicWidth()),
+                (int)(scaling_factor*background.getIntrinsicHeight()), Bitmap.Config.ARGB_8888);
+        //Create a canvas to enable us to draw onto
+        Canvas canvas = new Canvas(bitmap);
+        //Draw the 2 images ontop of eachother
+        background.draw(canvas);
+        vectorDrawable.draw(canvas);
+        //Return the output
+        return BitmapDescriptorFactory.fromBitmap(bitmap);
     }
 }

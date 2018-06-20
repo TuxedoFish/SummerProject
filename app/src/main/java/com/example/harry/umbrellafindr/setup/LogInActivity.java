@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.drawable.RippleDrawable;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.text.SpannableString;
 import android.text.style.UnderlineSpan;
@@ -16,19 +15,10 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.harry.umbrellafindr.app.ProfileActivity;
+import com.example.harry.umbrellafindr.app.DatabaseLogic;
+import com.example.harry.umbrellafindr.app.HubActivity;
 import com.example.harry.umbrellafindr.R;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.FirebaseFirestore;
-
-import java.lang.reflect.Array;
-import java.util.HashMap;
-import java.util.Map;
 
 public class LogInActivity extends AppCompatActivity implements View.OnTouchListener{
 
@@ -43,6 +33,8 @@ public class LogInActivity extends AppCompatActivity implements View.OnTouchList
 
     private FirebaseAuth mAuth;
 //    private FirebaseFirestore db;
+
+    private DatabaseLogic databaseLogic;
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -64,10 +56,9 @@ public class LogInActivity extends AppCompatActivity implements View.OnTouchList
         mEmail = (EditText) findViewById(R.id.editEmailLogIn);
         mPassword = (EditText) findViewById(R.id.editPasswordLogIn);
 
-        mAuth = FirebaseAuth.getInstance();
-
-        if(mAuth.getCurrentUser()!=null) {
-            start(mButtonStart);
+        databaseLogic = new DatabaseLogic();
+        if(databaseLogic.isLoggedIn()) {
+            completeLogIn();
         }
     }
 
@@ -84,55 +75,31 @@ public class LogInActivity extends AppCompatActivity implements View.OnTouchList
         return true;
     }
 
-    private void checkIfEmailVerified()
-    {
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-
-        if (user.isEmailVerified())
-        {
-            Intent toApp = new Intent(LogInActivity.this, ProfileActivity.class);
-            startActivity(toApp);
-            Toast.makeText(LogInActivity.this, "Successfully logged in", Toast.LENGTH_SHORT).show();
-        }
-        else
-        {
-            // email is not verified, so just prompt the message to the user and restart this activity.
-            // NOTE: don't forget to log out the user.
-            FirebaseAuth.getInstance().signOut();
-            Toast.makeText(LogInActivity.this, "Check your emails to verify your account", Toast.LENGTH_SHORT).show();
-            //restart this activity
-            finish();
-            startActivity(getIntent());
-        }
-    }
-
     public void start(View v) {
         String email = mEmail.getText().toString();
         String password = mPassword.getText().toString();
 
         if(!email.equals("") && !password.equals("")) {
-            mAuth.signInWithEmailAndPassword(email, password)
-                    .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                        @Override
-                        public void onComplete(@NonNull Task<AuthResult> task) {
-                            if (task.isSuccessful()) {
-                                // Sign in success, update UI with the signed-in user's information
-                                Log.d("logged in", "log in : success");
-
-                                checkIfEmailVerified();
-                            } else {
-                                // If sign in fails, display a message to the user.
-                                Log.w("failed", "log in : failure", task.getException());
-                                Toast.makeText(LogInActivity.this, "Log in failed." + task.getException(),
-                                        Toast.LENGTH_SHORT).show();
-                            }
-                        }
-                    });
+            databaseLogic.attemptLogIn(this, email, password);
         } else {
             Log.e("failed", "log in : failure");
             Toast.makeText(LogInActivity.this, "Log in failed",
                     Toast.LENGTH_SHORT).show();
         }
+    }
+
+    public void completeLogIn() {
+        Intent toApp = new Intent(LogInActivity.this, HubActivity.class);
+        startActivity(toApp);
+        Toast.makeText(LogInActivity.this, "Successfully logged in", Toast.LENGTH_SHORT).show();
+    }
+
+    public void signOut() {
+        databaseLogic.signOut();
+        Toast.makeText(LogInActivity.this, "Check your emails to verify your account", Toast.LENGTH_SHORT).show();
+        //restart this activity
+        finish();
+        startActivity(getIntent());
     }
 
     public void register(View v) {

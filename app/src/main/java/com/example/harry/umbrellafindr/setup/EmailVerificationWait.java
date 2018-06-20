@@ -9,7 +9,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 
-import com.example.harry.umbrellafindr.app.ProfileActivity;
+import com.example.harry.umbrellafindr.app.HubActivity;
 import com.example.harry.umbrellafindr.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -52,7 +52,7 @@ public class EmailVerificationWait extends AppCompatActivity implements View.OnC
                                 ImageView thumbs_down = (ImageView) findViewById(R.id.visualisation);
                                 thumbs_down.setImageResource(R.drawable.ic_thumbs_up);
 
-                                startActivity(new Intent(EmailVerificationWait.this, ProfileActivity.class));
+                                startActivity(new Intent(EmailVerificationWait.this, HubActivity.class));
                             } else {
                                 //User has not verified
                                 FirebaseAuth.getInstance().signOut();

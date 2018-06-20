@@ -22,10 +22,10 @@ public class User {
     private Uri mimageURI;
     private Constants.Gender mGender;
     private String mUserID, mPartnerID;
-    private Location mLocation;
+    private GeoPoint mLocation;
     private int mStatus = Constants.STATUS_ONLINE;
 
-    public User(String userID, String firstname, String email, int age, Uri imageURI, Constants.Gender gender, Location location) {
+    public User(String userID, String firstname, String email, int age, Uri imageURI, String gender, GeoPoint location) {
         setFirstName(firstname); setEmail(email); setAge(age); setImageURI(imageURI); setGender(gender); mUserID = userID; mLocation = location;
     }
 
@@ -33,13 +33,15 @@ public class User {
         setmStatus(db, Constants.STATUS_SEARCHING);
     }
 
+    public String getPotentialPartnerId() {
+        return mPartnerID;
+    }
+
     public void setmStatus(FirebaseFirestore db, int new_status) {
         this.mStatus = new_status;
 
-        GeoPoint user_loc = new GeoPoint(mLocation.getLatitude(), mLocation.getLongitude());
-
         Map<String, Object> data = new HashMap<>();
-        data.put("location", user_loc);
+        data.put("location", mLocation);
         data.put("status", new_status);
 
         db.collection("strollers").document(mUserID).set(data);
@@ -48,7 +50,7 @@ public class User {
         return mStatus;
     }
 
-    private int search(FirebaseFirestore db) {
+    public int search(FirebaseFirestore db) {
         //Query database for nearby users where the distance is close and the status is 1 i.e. searching
         Utilities utils = new Utilities();
 
@@ -64,6 +66,7 @@ public class User {
                 @Override
                 public void onComplete(@NonNull Task<QuerySnapshot> task) {
                     mStatus = Constants.STATUS_PENDING;
+                    mPartnerID = task.getResult().getDocuments().get(0).getId();
                 }
             });
         }
@@ -79,6 +82,7 @@ public class User {
             } else if (utils.isRequests(db, mPartnerID)) {
                 //other user has received a request hence will return to searching again
                 setmStatus(db, Constants.STATUS_SEARCHING);
+                mPartnerID = null;
             } else {
                 //free to send a request to the other user
                 setmStatus(db, Constants.STATUS_DECISION_A);
@@ -88,6 +92,10 @@ public class User {
         }
 
         return Constants.RESULT_NO_USERS;
+    }
+
+    public String getMyId() {
+        return mUserID;
     }
 
     public String getFirstName() { return mFirstName; }
@@ -103,5 +111,13 @@ public class User {
     public void setImageURI(Uri imageURI) { this.mimageURI = imageURI; }
 
     public Constants.Gender getGender() { return mGender; }
-    public void setGender(Constants.Gender gender) { this.mGender = gender; }
+    public void setGender(String gender) {
+        if(gender.equals("MALE")) {
+            this.mGender = Constants.Gender.MALE;
+        } else if(gender.equals("FEMALE")) {
+            this.mGender = Constants.Gender.FEMALE;
+        } else {
+            this.mGender = Constants.Gender.UNKNOWN;
+        }
+    }
 }

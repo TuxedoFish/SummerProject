@@ -207,7 +207,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnTouchL
         FirebaseUser user = mAuth.getCurrentUser();
 
         String mGenderText = "unknown";
-        if(mGender) { mGenderText = "male"; } else { mGenderText = "female"; }
+        if(mGender) { mGenderText = "MALE"; } else { mGenderText = "FEMALE"; }
 
         // Create a Map to store the data we want to set
         DocumentReference docRef = db.collection("users_info").document(user.getUid());
@@ -216,6 +216,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnTouchL
         data.put("age", mAge);
         data.put("gender", mGenderText);
         data.put("bio", mBio);
+        data.put("email", mEmail.getText().toString());
         data.put("profile_picture", mProfilePictureURI.toString());
 
         // Add a new document (asynchronously) in collection "users" with id "uid"

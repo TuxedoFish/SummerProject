@@ -20,7 +20,7 @@ public final class Constants {
     public static final int STATUS_PENDING = 3;
     public static final int STATUS_DECISION_A = 4;
     public static final int STATUS_DECISION_B = 5;
-    public static final int STATUS_OFFLINE = 6;
+    public static final int STATUS_ERROR = 6;
 
     public static final int RESULT_NO_USERS = 7;
     public static final int RESULT_REQUESTED = 8;
@@ -33,7 +33,8 @@ public final class Constants {
     //gender for use in user class
     public enum Gender {
         MALE,
-        FEMALE
+        FEMALE,
+        UNKNOWN
     }
 }
 
