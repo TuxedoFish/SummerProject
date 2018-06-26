@@ -3,29 +3,45 @@ package com.example.harry.umbrellafindr.utils;
 import android.location.Location;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.lang.reflect.Array;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import javax.annotation.Nullable;
 
 public class User {
     private String mFirstName, mEmail;
-    private int mAge;
-    private Uri mimageURI;
+    private Long mAge;
+    private String mimageURI;
     private Constants.Gender mGender;
     private String mUserID, mPartnerID;
     private GeoPoint mLocation;
-    private int mStatus = Constants.STATUS_ONLINE;
 
-    public User(String userID, String firstname, String email, int age, Uri imageURI, String gender, GeoPoint location) {
+    private int mStatus = Constants.STATUS_ONLINE;
+    private boolean sentRequest = false;
+
+    private EventListener mSendRequestListene = new EventListener() {
+        @Override
+        public void onEvent(@Nullable Object o, @Nullable FirebaseFirestoreException e) {
+
+        }
+    };
+
+    public User(String userID, String firstname, String email, Long age, String imageURI, String gender, GeoPoint location) {
         setFirstName(firstname); setEmail(email); setAge(age); setImageURI(imageURI); setGender(gender); mUserID = userID; mLocation = location;
     }
 
@@ -50,48 +66,51 @@ public class User {
         return mStatus;
     }
 
-    public int search(FirebaseFirestore db) {
+    public void search(final FirebaseFirestore db) {
         //Query database for nearby users where the distance is close and the status is 1 i.e. searching
-        Utilities utils = new Utilities();
+        final Utilities utils = new Utilities();
 
-        if(utils.isRequests(db, mUserID)) {
-            //request found
-            setmStatus(db, Constants.STATUS_DECISION_A);
-            return Constants.RESULT_REQUESTED;
-        } else {
-            //no request found
-            Query query = utils.getUsersSearching(db, mLocation.getLatitude(), mLocation.getLongitude());
-            //check if there is any users currently online searching
-            query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                @Override
-                public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                    mStatus = Constants.STATUS_PENDING;
-                    mPartnerID = task.getResult().getDocuments().get(0).getId();
-                }
-            });
-        }
+        utils.isRequests(db, mUserID, new EventListener<DocumentSnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
+                        if(documentSnapshot.exists()) {
+                            //Already requested
+                            if(mStatus==Constants.STATUS_SEARCHING) {
+                                setmStatus(db, Constants.STATUS_DECISION_A);
+                            }
+                        } else {
+                            //no request found
+                            Query query = utils.getUsersSearching(db, mLocation.getLatitude(), mLocation.getLongitude());
+                            //check if there is any users currently online searching
+                            query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                    List<DocumentSnapshot> result = task.getResult().getDocuments();
 
-        if(mStatus == Constants.STATUS_PENDING) {
-            setmStatus(db, mStatus);
-            //Check if in the time it took another user has sent you or your potential partner a request
-            if(utils.isRequests(db, mUserID)) {
-                //request received
-                setmStatus(db, Constants.STATUS_DECISION_B);
-                //go to decision tree page
-                return Constants.RESULT_REQUESTED;
-            } else if (utils.isRequests(db, mPartnerID)) {
-                //other user has received a request hence will return to searching again
-                setmStatus(db, Constants.STATUS_SEARCHING);
-                mPartnerID = null;
-            } else {
-                //free to send a request to the other user
-                setmStatus(db, Constants.STATUS_DECISION_A);
-                //go to decision tree page
-                return Constants.RESULT_SEND_REQUEST;
-            }
-        }
+                                    for(int i=0; i<task.getResult().getDocuments().size() && !sentRequest; i++) {
+                                        if(mStatus==Constants.STATUS_SEARCHING && !result.get(i).getId().equals(mUserID)) {
+                                            Log.d("helper", "I tried to find a match");
+                                            final String potentialID = result.get(i).getId();
 
-        return Constants.RESULT_NO_USERS;
+                                            utils.isRequests(db, result.get(i).getId(), new EventListener<DocumentSnapshot>() {
+                                                @Override
+                                                public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
+                                                    if(!documentSnapshot.exists() && !sentRequest) {
+                                                        sentRequest = true;
+                                                        setmStatus(db, Constants.STATUS_DECISION_B);
+                                                        mPartnerID = potentialID;
+                                                        utils.sendRequest(db, mPartnerID
+                                                                , mUserID);
+                                                    }
+                                                }
+                                            });
+                                        }
+                                    }
+                                }
+                            });
+                        }
+                    }
+        });
     }
 
     public String getMyId() {
@@ -104,11 +123,11 @@ public class User {
     public String getEmail() { return mEmail; }
     public void setEmail(String email) { this.mEmail = email; }
 
-    public int getAge() { return mAge; }
-    public void setAge(int age) { this.mAge = age; }
+    public Long getAge() { return mAge; }
+    public void setAge(Long age) { this.mAge = age; }
 
-    public Uri getImageURI() { return mimageURI; }
-    public void setImageURI(Uri imageURI) { this.mimageURI = imageURI; }
+    public String getImageURI() { return mimageURI; }
+    public void setImageURI(String imageURI) { this.mimageURI = imageURI; }
 
     public Constants.Gender getGender() { return mGender; }
     public void setGender(String gender) {

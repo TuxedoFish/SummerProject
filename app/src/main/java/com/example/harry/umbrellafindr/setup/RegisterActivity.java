@@ -5,6 +5,7 @@ import android.app.DialogFragment;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.RippleDrawable;
 import android.net.Uri;
 import android.provider.MediaStore;
@@ -27,6 +28,8 @@ import com.example.harry.umbrellafindr.utils.Utilities;
 import com.example.harry.umbrellafindr.utils.Constants;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
@@ -34,7 +37,11 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreSettings;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
+import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -54,6 +61,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnTouchL
 
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
+    private FirebaseStorage storage;
 
     private Utilities utils;
 
@@ -83,12 +91,15 @@ public class RegisterActivity extends AppCompatActivity implements View.OnTouchL
 
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
+        storage = FirebaseStorage.getInstance();
 
         FirebaseFirestore firestore = FirebaseFirestore.getInstance();
-        FirebaseFirestoreSettings settings = new FirebaseFirestoreSettings.Builder()
-                .setTimestampsInSnapshotsEnabled(true)
-                .build();
-        firestore.setFirestoreSettings(settings);
+        if(!firestore.getFirestoreSettings().areTimestampsInSnapshotsEnabled()) {
+            FirebaseFirestoreSettings settings = new FirebaseFirestoreSettings.Builder()
+                    .setTimestampsInSnapshotsEnabled(true)
+                    .build();
+            firestore.setFirestoreSettings(settings);
+        }
 
         mAuth.signOut();
     }
@@ -119,7 +130,8 @@ public class RegisterActivity extends AppCompatActivity implements View.OnTouchL
                                         if (task.isSuccessful()) {
                                             // Sign in success, update UI with the signed-in user's information
                                             Log.d("created", "createUserWithEmail:success");
-                                            updateUserInfo(mFirstName.getEditableText().toString(), mProfilePictureURI, mGenderSwitch.getShowText(), -1, "please add a bio");
+                                            updateUserInfo(mFirstName.getEditableText().toString(), mProfilePictureURI, mGenderSwitch.getShowText(),
+                                                    -1, "please add a bio");
                                         } else {
                                             // If sign in fails, display a message to the user.
                                             Log.w("failed", "createUserWithEmail : failure", task.getException());
@@ -209,6 +221,33 @@ public class RegisterActivity extends AppCompatActivity implements View.OnTouchL
         String mGenderText = "unknown";
         if(mGender) { mGenderText = "MALE"; } else { mGenderText = "FEMALE"; }
 
+        //Add image to storage
+        StorageReference storageReference = storage.getReference();
+        StorageReference imageReference = storageReference.child(mAuth.getCurrentUser().getUid() + "/pp_1");
+
+        // Get the data from an ImageView as bytes
+        mProfilePicture.setDrawingCacheEnabled(true);
+        mProfilePicture.buildDrawingCache();
+        Bitmap bitmap = ((BitmapDrawable) mProfilePicture.getDrawable()).getBitmap();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+        byte[] image_data = baos.toByteArray();
+
+        UploadTask uploadTask = imageReference.putBytes(image_data);
+        uploadTask.addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                // Handle unsuccessful uploads
+                Log.d("failure", "failed to upload image");
+            }
+        }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                // taskSnapshot.getMetadata() contains file metadata such as size, content-type, etc.
+                Log.d("success", "image has been uploaded");
+            }
+        });
+
         // Create a Map to store the data we want to set
         DocumentReference docRef = db.collection("users_info").document(user.getUid());
         Map<String, Object> data = new HashMap<>();
@@ -217,7 +256,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnTouchL
         data.put("gender", mGenderText);
         data.put("bio", mBio);
         data.put("email", mEmail.getText().toString());
-        data.put("profile_picture", mProfilePictureURI.toString());
+        data.put("profile_picture", "pp_1");
 
         // Add a new document (asynchronously) in collection "users" with id "uid"
         docRef.set(data).addOnCompleteListener(new OnCompleteListener<Void>() {

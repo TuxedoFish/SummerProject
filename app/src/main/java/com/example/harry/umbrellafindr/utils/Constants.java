@@ -22,13 +22,11 @@ public final class Constants {
     public static final int STATUS_DECISION_B = 5;
     public static final int STATUS_ERROR = 6;
 
-    public static final int RESULT_NO_USERS = 7;
-    public static final int RESULT_REQUESTED = 8;
-    public static final int RESULT_SEND_REQUEST = 9;
-
     public static final int NO_REPLY = 10;
     public static final int POSITIVE_REPLY = 11;
     public static final int NEGATIVE_REPLY = 12;
+
+    public static final int REQUEST_DECISION_FROM_USER = 13;
 
     //gender for use in user class
     public enum Gender {

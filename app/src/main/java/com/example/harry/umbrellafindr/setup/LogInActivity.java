@@ -15,7 +15,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.harry.umbrellafindr.app.DatabaseLogic;
+import com.example.harry.umbrellafindr.utils.DatabaseLogic;
 import com.example.harry.umbrellafindr.app.HubActivity;
 import com.example.harry.umbrellafindr.R;
 import com.google.firebase.auth.FirebaseAuth;

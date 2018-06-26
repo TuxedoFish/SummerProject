@@ -11,7 +11,6 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
-
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -42,10 +41,12 @@
         <activity
             android:name=".app.HubActivity"
             android:label="@string/title_activity_profile" />
-        <activity android:name=".setup.RegisterActivity"
-            android:configChanges="orientation|keyboardHidden|screenSize"/>
+        <activity
+            android:name=".setup.RegisterActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize" />
         <activity android:name=".setup.ForgottenPasswordActivity" />
-        <activity android:name=".setup.EmailVerificationWait"/>
+        <activity android:name=".setup.EmailVerificationWait" />
+        <activity android:name=".app.DecisionActivity"></activity>
     </application>
 
 </manifest>

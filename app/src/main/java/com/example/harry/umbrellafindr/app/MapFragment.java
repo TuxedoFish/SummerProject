@@ -1,19 +1,16 @@
 package com.example.harry.umbrellafindr.app;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
-import android.support.annotation.DrawableRes;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -23,8 +20,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.harry.umbrellafindr.R;
-import com.example.harry.umbrellafindr.setup.RegisterActivity;
 import com.example.harry.umbrellafindr.utils.Constants;
+import com.example.harry.umbrellafindr.utils.DatabaseLogic;
 import com.example.harry.umbrellafindr.utils.User;
 import com.example.harry.umbrellafindr.utils.Utilities;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -32,27 +29,14 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.model.BitmapDescriptor;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.GeoPoint;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class MapFragment extends Fragment{
     MapView mMapView;
@@ -68,6 +52,11 @@ public class MapFragment extends Fragment{
 
     private User mUser;
     private ArrayList<User> fakeUsers;
+
+    public Communicator mCommunicator;
+    public interface Communicator {
+        public void sendRequest(int RESULT_CODE);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -89,6 +78,7 @@ public class MapFragment extends Fragment{
         mMapView.onResume(); // needed to get the map to display immediately
 
         utils = new Utilities();
+        fakeUsers = new ArrayList<User>();
 
         databaseLogic = new DatabaseLogic();
         databaseLogic.addFakeUsers();
@@ -125,6 +115,34 @@ public class MapFragment extends Fragment{
         return rootView;
     }
 
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        // Verify that the host activity implements the callback interface
+        try {
+            // Instantiate the NoticeDialogListener so we can send events to the host
+            mCommunicator = (HubActivity) activity;
+        } catch (ClassCastException e) {
+            // The activity doesn't implement the interface, throw exception
+            throw new ClassCastException(activity.toString()
+                    + " must implement NoticeDialogListener");
+        }
+    }
+
+    public void beginSearch() {
+        mUser.beginSearching(databaseLogic.getDb());
+
+        final Handler handler = new Handler();
+        final int delay = 1000; //milliseconds
+
+        handler.postDelayed(new Runnable(){
+            public void run(){
+                searchLogic();
+                handler.postDelayed(this, delay);
+            }
+        }, delay);
+    }
+
     public void handleLocation() {
         // Acquire a reference to the system Location Manager
         mLocationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
@@ -135,8 +153,12 @@ public class MapFragment extends Fragment{
                 // Called when a new location is found by the network location provider.
                 mlatitude =location.getLatitude();
                 mlongitude = location.getLongitude();
-                ArrayList<User> users = databaseLogic.makeUseOfNewLocation(location.getLongitude(), location.getLatitude());
-                updateUserData(users);
+                databaseLogic.makeUseOfNewLocation(location.getLongitude(), location.getLatitude(), new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        addUserData(task);
+                    }
+                });
             }
 
             public void onStatusChanged(String provider, int status, Bundle extras) {}
@@ -155,52 +177,55 @@ public class MapFragment extends Fragment{
         }
 
         //HARDCODED FOR USE ON EMULATOR.
-        ArrayList<User> users = databaseLogic.makeUseOfNewLocation(-0.1268, 51.5407);
-        updateUserData(users);
+        databaseLogic.makeUseOfNewLocation(-0.1268, 51.5407, new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                addUserData(task);
+            }
+        });
         mlatitude = 51.5407;
         mlongitude = -0.1268;
     }
 
-    public void searchLogic() {
-        int RESULT_CODE = Constants.STATUS_ERROR;
+    public void addUserData(@NonNull Task<DocumentSnapshot> task) {
+        if(task.isSuccessful()) {
+            User user = null;
+            DocumentSnapshot result = task.getResult();
 
-        if(mUser.getmStatus() == Constants.STATUS_SEARCHING) {
-            RESULT_CODE = mUser.search(databaseLogic.getDb());
-            if(RESULT_CODE == Constants.STATUS_DECISION_A) {
-                utils.sendRequest(databaseLogic.getDb(), mUser.getPotentialPartnerId(), mUser.getMyId());
-                //start up decision activity FOR RESULT
-                //SENT REQUEST
-
+            if (result.exists()) {
+                user = new User(result.getId(), (String)result.get("first_name"), (String)result.get("email"),
+                   (Long)result.get("age"), (String)result.get("profile_picture"), (String)result.get("gender"), new GeoPoint(mlatitude, mlongitude));
+            } else {
+                Log.d("error", "no such user found");
             }
-            if(RESULT_CODE == Constants.STATUS_DECISION_B) {
-                //start up decision activity FOR RESULT
-                //RECIEVED REQUEST
-
-            }
-        }
-        for(int i=0; i<fakeUsers.size(); i++) {
-            if (fakeUsers.get(i).getmStatus() == Constants.STATUS_SEARCHING) {
-                RESULT_CODE = fakeUsers.get(i).search(databaseLogic.getDb());
-                if(RESULT_CODE == Constants.STATUS_DECISION_A) {
-                    utils.sendRequest(databaseLogic.getDb(), fakeUsers.get(i).getPotentialPartnerId(), fakeUsers.get(i).getMyId());
-                    //start up decision activity FOR RESULT
-                    //SENT REQUEST
-
-                }
-                if(RESULT_CODE == Constants.STATUS_DECISION_B) {
-                    //start up decision activity FOR RESULT
-                    //RECIEVED REQUEST
-
+            if(user!=null) {
+                if(user.getMyId().equals(databaseLogic.getCurrentUserId())) {
+                    mUser = user;
+                } else {
+                    user.beginSearching(databaseLogic.getDb());
+                    fakeUsers.add(user);
                 }
             }
+        } else {
+            Log.d("error", "Database query looking for user failed");
         }
     }
 
-    public void updateUserData(ArrayList<User> users) {
-        mUser = users.get(0);
-        fakeUsers.clear();
-        for(int i=1; i<users.size(); i++) {
-            fakeUsers.add(users.get(i));
+    public void searchLogic() {
+        if(mUser.getmStatus() == Constants.STATUS_SEARCHING) {
+            mUser.search(databaseLogic.getDb());
+        }
+        if(mUser.getmStatus() == Constants.STATUS_DECISION_A || mUser.getmStatus() == Constants.STATUS_DECISION_B) {
+            //start up decision activity FOR RESULT
+            //Result code lets the activity know whether you are sender or receiver
+            mCommunicator.sendRequest(mUser.getmStatus());
+
+        }
+
+        for(int i=0; i<fakeUsers.size(); i++) {
+            if (fakeUsers.get(i).getmStatus() == Constants.STATUS_SEARCHING) {
+                fakeUsers.get(i).search(databaseLogic.getDb());
+            }
         }
     }
 

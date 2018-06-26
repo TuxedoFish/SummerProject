@@ -1,4 +1,4 @@
-package com.example.harry.umbrellafindr.app;
+package com.example.harry.umbrellafindr.utils;
 
 import android.content.Context;
 import android.content.Intent;
@@ -24,6 +24,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreSettings;
 import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -40,15 +41,19 @@ public class DatabaseLogic {
 
     public DatabaseLogic() {
         db = FirebaseFirestore.getInstance();
+        if(!db.getFirestoreSettings().areTimestampsInSnapshotsEnabled()) {
+            FirebaseFirestoreSettings settings = new FirebaseFirestoreSettings.Builder()
+                    .setTimestampsInSnapshotsEnabled(true)
+                    .build();
+            db.setFirestoreSettings(settings);
+        }
         mAuth = FirebaseAuth.getInstance();
     }
-    public ArrayList<User> makeUseOfNewLocation(double longitude, double latitude) {
-        ArrayList<User> users = new ArrayList<User>();
-
+    public void makeUseOfNewLocation(double longitude, double latitude, OnCompleteListener<DocumentSnapshot> onCompleteListener) {
         DocumentReference docref = db.collection("strollers").document(mAuth.getCurrentUser().getUid());
         GeoPoint user_loc = new GeoPoint(latitude, longitude);
 
-        users.add(getUser(mAuth.getCurrentUser().getUid(), user_loc));
+        getUser(mAuth.getCurrentUser().getUid(), user_loc, onCompleteListener);
 
         Map<String, Object> locationData = new HashMap<>();
         locationData.put("location", user_loc);
@@ -57,9 +62,7 @@ public class DatabaseLogic {
         docref.set(locationData);
 
         //ONLY FOR DEBUGGING
-        users.addAll(populateArea(longitude, latitude));
-
-        return users;
+        populateArea(longitude, latitude, onCompleteListener);
     }
 
     public void addMarkers(final Context context, final GoogleMap googleMap, double mlatitude, double mlongitude) {
@@ -122,18 +125,9 @@ public class DatabaseLogic {
         return db;
     }
 
-    public User getUser(String userId, GeoPoint location) {
+    public void getUser(String userId, GeoPoint location, OnCompleteListener<DocumentSnapshot> onCompleteListener) {
         DocumentReference docref = db.collection("users_info").document(userId);
-        DocumentSnapshot result = docref.get().getResult();
-
-        if(result.exists()) {
-//            return new User(userId, (String)result.get("first_name"), (String)result.get("email"), (int)result.get("age"),
-//                    result.get("profile_picture"), (String)result.get("gender"), location);
-            return null;
-        } else {
-            Log.d("error", "no such user found : " + userId);
-            return null;
-        }
+        docref.get().addOnCompleteListener(onCompleteListener);
     }
 
     public String getCurrentUserId() {
@@ -172,10 +166,10 @@ public class DatabaseLogic {
         Map<String, Object> mFakeData = new HashMap<>();
 
         mFakeData.put("first_name", mName);
-        mFakeData.put("age", "unknown");
+        mFakeData.put("age", -1);
         mFakeData.put("gender", "UNKNOWN");
         mFakeData.put("bio", "please enter a bio");
-        mFakeData.put("profile_picture", "somewhere");
+        mFakeData.put("profile_picture", "icon-profile.png");
         mFakeData.put("email", "someone@ucl.ac.uk");
 
         return mFakeData;
@@ -192,7 +186,7 @@ public class DatabaseLogic {
             });
         }
     }
-    public ArrayList<User> populateArea(double longitude, double latitude) {
+    public void populateArea(double longitude, double latitude, OnCompleteListener<DocumentSnapshot> onCompleteListener) {
         //all in miles
         double degree_lat = 69;
         double degree_long = Math.cos(Math.toRadians(latitude)) * 69.172;
@@ -222,7 +216,7 @@ public class DatabaseLogic {
             DocumentReference docref = db.collection("strollers").document("user_"+i);
             GeoPoint user_loc = new GeoPoint(latitude+latitude_user, longitude+longitude_user);
 
-            users.add(getUser("user_"+i, user_loc));
+            getUser("user_"+i, user_loc, onCompleteListener);
 
             Map<String, Object> locationData = new HashMap<>();
             locationData.put("location", user_loc);
@@ -230,7 +224,5 @@ public class DatabaseLogic {
 
             docref.set(locationData);
         }
-
-        return users;
     }
 }

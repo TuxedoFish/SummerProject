@@ -19,7 +19,9 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.Query;
 
@@ -33,6 +35,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+
+import javax.annotation.Nullable;
 
 public class Utilities {
     public boolean hasImageCaptureBug() {
@@ -69,18 +73,13 @@ public class Utilities {
         return query;
     }
 
-    public boolean isRequests(FirebaseFirestore db, String userID) {
+    public void isRequests(FirebaseFirestore db, String userID, EventListener<DocumentSnapshot> eventListener) {
         DocumentReference docref = db.collection("meetups").document(userID);
-
-        if (docref.get().getResult().exists()) {
-            return true;
-        } else {
-            return false;
-        }
+        docref.addSnapshotListener(eventListener);
     }
 
     public void sendRequest(FirebaseFirestore db, String targetUserID, String userID) {
-        DocumentReference docref = db.collection("strollers").document(targetUserID);
+        DocumentReference docref = db.collection("meetups").document(targetUserID);
 
         Map<String, Object> requestData = new HashMap<>();
         requestData.put("requester", userID);

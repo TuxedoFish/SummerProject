@@ -3,20 +3,26 @@ package com.example.harry.umbrellafindr.app;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
-import android.graphics.drawable.RippleDrawable;
+import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
-import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
-import android.widget.ImageButton;
 
 import com.example.harry.umbrellafindr.R;
-import com.example.harry.umbrellafindr.utils.User;
+import com.example.harry.umbrellafindr.utils.Constants;
 
-public class HubActivity extends AppCompatActivity {
+public class HubActivity extends AppCompatActivity implements MapFragment.Communicator{
+    private SearchOverlayFragment mSearchOverlayFragment;
+    private MapFragment mMapFragment;
+
+    @Override
+    public void sendRequest(int REQUEST_CODE) {
+        Intent toDecision = new Intent(HubActivity.this, DecisionActivity.class);
+
+        toDecision.putExtra("REQUEST_CODE", REQUEST_CODE);
+        startActivityForResult(toDecision, Constants.REQUEST_DECISION_FROM_USER);
+    }
+
     private void closeFragment(int id) {
         FragmentManager fragmentManager = getFragmentManager();
         if(fragmentManager.findFragmentById(id) != null) {
@@ -38,12 +44,12 @@ public class HubActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_profile);
+        setContentView(R.layout.activity_hub);
 
-        MapFragment maps = new MapFragment();
-        openFragment(maps, R.id.contentPanel);
-        SearchOverlayFragment searchOverlayFragment = new SearchOverlayFragment();
-        openFragment(searchOverlayFragment, R.id.overlayPanel);
+        mMapFragment = new MapFragment();
+        openFragment(mMapFragment, R.id.contentPanel);
+        mSearchOverlayFragment = new SearchOverlayFragment();
+        openFragment(mSearchOverlayFragment, R.id.overlayPanel);
 
 //        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
 //        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);

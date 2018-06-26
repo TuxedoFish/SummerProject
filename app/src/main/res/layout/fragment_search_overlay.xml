@@ -44,7 +44,8 @@
                 android:layout_marginBottom="16dp"
                 android:adjustViewBounds="true"
                 android:background="@drawable/button_icon"
-                android:scaleType="fitXY"/>
+                android:onClick="onSearch"
+                android:scaleType="fitXY" />
 
         </LinearLayout>
 
