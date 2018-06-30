@@ -22,6 +22,9 @@ public final class Constants {
     public static final int STATUS_DECISION_B = 5;
     public static final int STATUS_ERROR = 6;
 
+    public static final String REQUEST_NULL = "null";
+    public static final String REQUEST_FAILED = "fail";
+
     public static final int NO_REPLY = 10;
     public static final int POSITIVE_REPLY = 11;
     public static final int NEGATIVE_REPLY = 12;

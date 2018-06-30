@@ -212,18 +212,18 @@ public class MapFragment extends Fragment{
     }
 
     public void searchLogic() {
-        if(mUser.getmStatus() == Constants.STATUS_SEARCHING) {
+        if(mUser.getmStatus() == Constants.STATUS_SEARCHING  || mUser.getmStatus() == Constants.STATUS_PENDING) {
             mUser.search(databaseLogic.getDb());
         }
         if(mUser.getmStatus() == Constants.STATUS_DECISION_A || mUser.getmStatus() == Constants.STATUS_DECISION_B) {
             //start up decision activity FOR RESULT
             //Result code lets the activity know whether you are sender or receiver
-            mCommunicator.sendRequest(mUser.getmStatus());
 
+            //mCommunicator.sendRequest(mUser.getmStatus());
         }
 
         for(int i=0; i<fakeUsers.size(); i++) {
-            if (fakeUsers.get(i).getmStatus() == Constants.STATUS_SEARCHING) {
+            if (fakeUsers.get(i).getmStatus() == Constants.STATUS_SEARCHING  || fakeUsers.get(i).getmStatus() == Constants.STATUS_PENDING) {
                 fakeUsers.get(i).search(databaseLogic.getDb());
             }
         }

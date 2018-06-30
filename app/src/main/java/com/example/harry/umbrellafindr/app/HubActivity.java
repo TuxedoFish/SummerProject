@@ -11,9 +11,14 @@ import android.view.View;
 import com.example.harry.umbrellafindr.R;
 import com.example.harry.umbrellafindr.utils.Constants;
 
-public class HubActivity extends AppCompatActivity implements MapFragment.Communicator{
+public class HubActivity extends AppCompatActivity implements MapFragment.Communicator, SearchOverlayFragment.clickListener{
     private SearchOverlayFragment mSearchOverlayFragment;
     private MapFragment mMapFragment;
+
+    @Override
+    public void onSearch(View v) {
+        mMapFragment.beginSearch();
+    }
 
     @Override
     public void sendRequest(int REQUEST_CODE) {

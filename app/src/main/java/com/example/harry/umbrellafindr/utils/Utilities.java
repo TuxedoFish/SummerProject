@@ -10,6 +10,8 @@ import android.provider.MediaStore;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
+import android.util.EventLog;
+import android.util.Log;
 
 import com.example.harry.umbrellafindr.R;
 import com.google.android.gms.maps.model.BitmapDescriptor;
@@ -26,6 +28,7 @@ import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.Query;
 
 import com.example.harry.umbrellafindr.utils.Constants;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -73,20 +76,38 @@ public class Utilities {
         return query;
     }
 
-    public void isRequests(FirebaseFirestore db, String userID, EventListener<DocumentSnapshot> eventListener) {
-        DocumentReference docref = db.collection("meetups").document(userID);
-        docref.addSnapshotListener(eventListener);
+    public void isAnyRequests(FirebaseFirestore db, String userID, EventListener<QuerySnapshot> eventListener) {
+        CollectionReference collref = db.collection("strollers").document(userID).collection("requests");
+        collref.addSnapshotListener(eventListener);
     }
 
-    public void sendRequest(FirebaseFirestore db, String targetUserID, String userID) {
-        DocumentReference docref = db.collection("meetups").document(targetUserID);
+    public void checkPartner(FirebaseFirestore db, String partnerID, EventListener<DocumentSnapshot> listener) {
+        DocumentReference docref = db.collection("strollers").document(partnerID);
+        docref.addSnapshotListener(listener);
+    }
+
+    public void sendRequest(FirebaseFirestore db, final String targetUserID, final String userID) {
+        DocumentReference docref = db.collection("strollers").document(targetUserID).collection("requests")
+                .document(userID);
 
         Map<String, Object> requestData = new HashMap<>();
-        requestData.put("requester", userID);
-        requestData.put("user_A", Constants.NO_REPLY);
-        requestData.put("user_B", Constants.NO_REPLY);
+        requestData.put("status", "online");
 
-        docref.set(requestData);
+        docref.set(requestData).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if(task.isSuccessful()) {
+                    Log.d("SUCCESS", "request sent from : " + userID + " to : " + targetUserID);
+                } else {
+                    Log.d("FAILURE", "request failed : " + task.getException());
+                }
+            }
+        });
+    }
+
+    public void getResponseBack(FirebaseFirestore db, String userID, EventListener<DocumentSnapshot> listener) {
+        db.collection("strollers").document(userID).collection("info").document("info")
+                .addSnapshotListener(listener);
     }
 
     private GeoPoint[] getLocationBounds(double latitude, double longitude) {

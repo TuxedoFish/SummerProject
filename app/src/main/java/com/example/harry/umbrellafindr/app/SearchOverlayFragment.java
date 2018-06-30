@@ -23,6 +23,11 @@ public class SearchOverlayFragment extends Fragment {
     public ImageButton mSearchButton;
     public RippleDrawable mRippleRegister;
 
+    public clickListener mlistener;
+    public interface clickListener {
+        public void onSearch(View v);
+    }
+
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_search_overlay, container, false);

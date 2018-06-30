@@ -49,6 +49,7 @@ public class DatabaseLogic {
         }
         mAuth = FirebaseAuth.getInstance();
     }
+
     public void makeUseOfNewLocation(double longitude, double latitude, OnCompleteListener<DocumentSnapshot> onCompleteListener) {
         DocumentReference docref = db.collection("strollers").document(mAuth.getCurrentUser().getUid());
         GeoPoint user_loc = new GeoPoint(latitude, longitude);
@@ -58,6 +59,10 @@ public class DatabaseLogic {
         Map<String, Object> locationData = new HashMap<>();
         locationData.put("location", user_loc);
         locationData.put("status", Constants.STATUS_ONLINE);
+        locationData.put("partner_id", "NULL");
+        locationData.put("file_loc", "NULL");
+
+        Log.d("help", "tried to add data");
 
         docref.set(locationData);
 
@@ -221,6 +226,8 @@ public class DatabaseLogic {
             Map<String, Object> locationData = new HashMap<>();
             locationData.put("location", user_loc);
             locationData.put("status", Constants.STATUS_ONLINE);
+            locationData.put("partner_id", "NULL");
+            locationData.put("file_loc", "NULL");
 
             docref.set(locationData);
         }

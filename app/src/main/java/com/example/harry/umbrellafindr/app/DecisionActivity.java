@@ -11,8 +11,6 @@ public class DecisionActivity extends AppCompatActivity implements View.OnClickL
 
     private DatabaseLogic databaseLogic;
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
