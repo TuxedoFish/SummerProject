@@ -21,10 +21,10 @@ public class HubActivity extends AppCompatActivity implements MapFragment.Commun
     }
 
     @Override
-    public void sendRequest(int REQUEST_CODE) {
+    public void sendRequest(String user_id) {
         Intent toDecision = new Intent(HubActivity.this, DecisionActivity.class);
+        toDecision.putExtra("request_user_id", user_id);
 
-        toDecision.putExtra("REQUEST_CODE", REQUEST_CODE);
         startActivityForResult(toDecision, Constants.REQUEST_DECISION_FROM_USER);
     }
 

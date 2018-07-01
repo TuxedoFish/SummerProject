@@ -53,9 +53,11 @@ public class MapFragment extends Fragment{
     private User mUser;
     private ArrayList<User> fakeUsers;
 
+    private boolean deciding = false;
+
     public Communicator mCommunicator;
     public interface Communicator {
-        public void sendRequest(int RESULT_CODE);
+        public void sendRequest(String user_id);
     }
 
     @Override
@@ -137,8 +139,10 @@ public class MapFragment extends Fragment{
 
         handler.postDelayed(new Runnable(){
             public void run(){
-                searchLogic();
-                handler.postDelayed(this, delay);
+                if(!deciding) {
+                    searchLogic();
+                    handler.postDelayed(this, delay);
+                }
             }
         }, delay);
     }
@@ -215,11 +219,10 @@ public class MapFragment extends Fragment{
         if(mUser.getmStatus() == Constants.STATUS_SEARCHING  || mUser.getmStatus() == Constants.STATUS_PENDING) {
             mUser.search(databaseLogic.getDb());
         }
-        if(mUser.getmStatus() == Constants.STATUS_DECISION_A || mUser.getmStatus() == Constants.STATUS_DECISION_B) {
+        if(mUser.isDecisionToMake()) {
             //start up decision activity FOR RESULT
-            //Result code lets the activity know whether you are sender or receiver
-
-            //mCommunicator.sendRequest(mUser.getmStatus());
+            mCommunicator.sendRequest(mUser.getPotentialPartnerId());
+            deciding=true;
         }
 
         for(int i=0; i<fakeUsers.size(); i++) {

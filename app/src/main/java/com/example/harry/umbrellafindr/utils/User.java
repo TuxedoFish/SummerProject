@@ -21,6 +21,7 @@ import java.lang.reflect.Array;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.StringJoiner;
 
 import javax.annotation.Nullable;
 
@@ -32,6 +33,10 @@ public class User {
     private String mUserID, mPartnerID;
     private GeoPoint mLocation;
 
+    private boolean decisionToMake = false;
+
+    private String filename = "null";
+
     private int mStatus = Constants.STATUS_ONLINE;
     private boolean sentRequest = false;
 
@@ -40,9 +45,12 @@ public class User {
     }
 
     public void beginSearching(FirebaseFirestore db) {
+        sentRequest = false;
+        mPartnerID = null;
         setmStatus(db, Constants.STATUS_SEARCHING);
     }
 
+    public boolean isDecisionToMake() { return decisionToMake; }
     public String getPotentialPartnerId() {
         return mPartnerID;
     }
@@ -60,7 +68,17 @@ public class User {
         return mStatus;
     }
 
-    public void updateInformation(@Nullable QuerySnapshot queryDocumentSnapshots, FirebaseFirestore db) {
+    public String getFileName(String mID, String oID) {
+        int compare = mID.compareTo(oID);
+
+        if(compare<0) {
+            return mID.concat("_").concat(oID);
+        } else {
+            return oID.concat("_").concat(mID);
+        }
+    }
+
+    public void updateInformation(@Nullable QuerySnapshot queryDocumentSnapshots, FirebaseFirestore db, Utilities utils) {
         List<DocumentSnapshot> results = queryDocumentSnapshots.getDocuments();
 
         boolean accepted = false;
@@ -73,14 +91,18 @@ public class User {
                         .collection("info").document("info").set(getResponse(mUserID, mUserID));
                 accepted=true;
                 setmStatus(db, Constants.STATUS_DECISION_A);
-                haveMatched(db, Constants.STATUS_DECISION_A);
+                //File will be located at the id of the other user
+                mPartnerID = OtherID;
+                haveMatched(db, utils, Constants.STATUS_DECISION_A, OtherID);
             } else if (mStatus==Constants.STATUS_PENDING && mPartnerID.equals(OtherID)) {
-                //Both requested eachother
+                //Both requested eachother so alphabetic combination of the two ids
                 db.collection("strollers").document(OtherID)
                         .collection("info").document("info").set(getResponse(mUserID, mUserID));
                 accepted=true;
                 setmStatus(db, Constants.STATUS_DECISION_B);
-                haveMatched(db, Constants.STATUS_DECISION_B);
+                //Both requested eachother so file name is an alphabetic combination of the two
+                mPartnerID = OtherID;
+                haveMatched(db, utils, Constants.STATUS_DECISION_B, OtherID);
             } else {
                 //Removing other requests
                 db.collection("strollers").document(OtherID)
@@ -110,7 +132,7 @@ public class User {
             public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
                 if (!queryDocumentSnapshots.isEmpty()) {
                     //requested
-                    updateInformation(queryDocumentSnapshots, db);
+                    updateInformation(queryDocumentSnapshots, db, utils);
                 } else {
                     if (mStatus == Constants.STATUS_SEARCHING) {
                         //no request found
@@ -167,13 +189,14 @@ public class User {
                                                 //In case other user hasnt been notified yet
                                                 db.collection("strollers").document(mPartnerID)
                                                         .collection("info").document("info").set(getResponse(mUserID, mUserID));
-                                                haveMatched(db, Constants.STATUS_DECISION_B);
+                                                //Both requested so file is alphabetical combination of the two
+                                                haveMatched(db, utils, Constants.STATUS_DECISION_B, mPartnerID);
                                             } else if (result.equals(Constants.REQUEST_FAILED)) {
                                                 resetSearch(db);
                                             } else {
-                                                //Request acknowledged by other user
+                                                //Request acknowledged by other user so file located at MY ID
                                                 setmStatus(db, Constants.STATUS_DECISION_A);
-                                                haveMatched(db, Constants.STATUS_DECISION_A);
+                                                haveMatched(db, utils, Constants.STATUS_DECISION_A, mUserID);
                                             }
                                         }
                                     }
@@ -193,11 +216,30 @@ public class User {
                 .document("info").delete();
     }
 
-    public void haveMatched(FirebaseFirestore db, int type) {
-        Log.d("SUCCESS", "I have matched, name : " + mUserID + " type of match : " + type);
-
+    public void haveMatched(FirebaseFirestore db, Utilities utils, int type, String file_name) {
         db.collection("strollers").document(mUserID).collection("info")
                 .document("info").delete();
+        String temp_1 = "meetup_";
+
+        if(type==Constants.STATUS_DECISION_A) {
+            //One requested the other
+            filename = temp_1.concat(file_name);
+
+        } else {
+            //Both requested each other
+            String temp_2 = getFileName(mUserID, mPartnerID);
+
+            filename = temp_1.concat(temp_2);
+        }
+
+        Log.d("SUCCESS", "Match - " + mUserID + " to " + mPartnerID + " at " + filename + " : " + type);
+
+        if(mUserID.compareTo(mPartnerID)>0) {
+            //Create a meet-up form to confirm
+            utils.setUpDecisionForm(db, filename, mPartnerID, mUserID);
+        }
+
+        decisionToMake = true;
     }
 
     public String getMyId() {

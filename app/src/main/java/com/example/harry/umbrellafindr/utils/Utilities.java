@@ -86,6 +86,12 @@ public class Utilities {
         docref.addSnapshotListener(listener);
     }
 
+    public void getUserInfo(FirebaseFirestore db, String userID, EventListener<DocumentSnapshot> listener) {
+        Log.d("HELP", "looking for : " + userID);
+        DocumentReference docref = db.collection("users_info").document(userID);
+        docref.addSnapshotListener(listener);
+    }
+
     public void sendRequest(FirebaseFirestore db, final String targetUserID, final String userID) {
         DocumentReference docref = db.collection("strollers").document(targetUserID).collection("requests")
                 .document(userID);
@@ -108,6 +114,17 @@ public class Utilities {
     public void getResponseBack(FirebaseFirestore db, String userID, EventListener<DocumentSnapshot> listener) {
         db.collection("strollers").document(userID).collection("info").document("info")
                 .addSnapshotListener(listener);
+    }
+
+    public void setUpDecisionForm(FirebaseFirestore db, String file_name, String userID_1, String userID_2) {
+        DocumentReference docref = db.collection("meetups").document(file_name);
+
+        Map<String, Object> formData = new HashMap<>();
+
+        formData.put(userID_1, Constants.NO_REPLY);
+        formData.put(userID_2, Constants.NO_REPLY);
+
+        docref.set(formData);
     }
 
     private GeoPoint[] getLocationBounds(double latitude, double longitude) {
