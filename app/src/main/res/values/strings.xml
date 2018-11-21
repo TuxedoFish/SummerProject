@@ -15,6 +15,9 @@
     //Map page strings
     <string name="hint_text_box">Click to find a <b>coffee</b> buddy</string>
 
+    //Decision page strings
+    <string name="loading"><u>Loading ...</u></string>
+
     //Register page strings
     <string name="hint_first_name">Enter your <b>first name</b></string>
     <string name="hint_enter_email">Enter an authentic UCL email</string>
@@ -53,7 +56,6 @@
     <string name="picture_4">picture_4</string>
     <string name="bio_text">Lorem Ipsum is simply dummy text of the printing and typesetting industry.
         Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, when an unknown printer
-        took a galley of type and scrambled it to make a type specimen book. It has survived not only five
-        centuries, but also the leap into electronic typesetting, remaining essentially unchanged. </string>
+        took a galley of type and scrambled it to make a type specimen book. </string>
     <string name="profile_name">Placeholder Name</string>
 </resources>

@@ -1,0 +1,59 @@
+{
+  "project_info": {
+    "project_number": "921877592592",
+    "firebase_url": "https://umbrellafindr.firebaseio.com",
+    "project_id": "umbrellafindr",
+    "storage_bucket": "umbrellafindr.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:921877592592:android:ba20e6d0ef3a3a8c",
+        "android_client_info": {
+          "package_name": "com.example.harry.umbrellafindr"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "921877592592-e1r99u0fbmhcv7iv7vpce2sou0ihqh6r.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.harry.umbrellafindr",
+            "certificate_hash": "1e73a5b31e1ea9b375ff4b63970fdad58ec895f8"
+          }
+        },
+        {
+          "client_id": "921877592592-uncblv645nqiqbgo9uq16c1j44mb60mm.apps.googleusercontent.com",
+          "client_type": 3
+        },
+        {
+          "client_id": "921877592592-uncblv645nqiqbgo9uq16c1j44mb60mm.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAybiJuwiekwhuUZzn_CV3DCjoellBiV6E"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "921877592592-uncblv645nqiqbgo9uq16c1j44mb60mm.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

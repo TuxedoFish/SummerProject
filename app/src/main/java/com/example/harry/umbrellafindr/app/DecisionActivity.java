@@ -1,5 +1,6 @@
 package com.example.harry.umbrellafindr.app;
 
+import android.graphics.Paint;
 import android.graphics.drawable.RippleDrawable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -44,6 +45,7 @@ public class DecisionActivity extends AppCompatActivity implements View.OnTouchL
             @Override
             public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
                 nameText.setText((String)documentSnapshot.get("first_name"));
+                nameText.setPaintFlags(nameText.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
             }
         });
 
